@@ -22,6 +22,14 @@
   --color-line: #e3cdb0;
   --color-brand-red: #bd0004;
 
+  /* Front of House. Demo pill only. */
+  --color-foh-ink: #221c18;
+  --color-foh-ember: #c75b39;
+  --color-foh-ember-deep: #a8472b;
+  --color-foh-ember-bright: #d97b57;
+  --color-foh-paper: #fbf7f0;
+  --color-foh-muted-on-ink: #c9bba0;
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -171,52 +179,57 @@
   outline-offset: 3px;
 }
 
-/* Demo ribbon stays hidden after dismissal without a layout flash. */
-html[data-ribbon="off"] [data-demo-ribbon] {
+/* Demo pill (Front of House): full pill by default, small tab once minimized. Never removable. */
+[data-ribbon-tab] {
   display: none;
 }
-
-/* Room below the footer so the fixed ribbon never hides the last content. */
-html:not([data-ribbon="off"]) body:has([data-demo-ribbon]) {
-  padding-bottom: 8.5rem;
+html[data-foh-ribbon="min"] [data-ribbon-full] {
+  display: none;
 }
-@media (min-width: 640px) {
-  html:not([data-ribbon="off"]) body:has([data-demo-ribbon]) {
-    padding-bottom: 5.5rem;
-  }
+html[data-foh-ribbon="min"] [data-ribbon-tab] {
+  display: flex;
 }
 
-/* Attention nudge on the pitch button: rests, then scales and wobbles for ~600ms every 4s. */
-@keyframes pitch-nudge {
+/*
+ * Pitch button nudge: rests for ~3.4s, then over the last 600ms of each 4s
+ * cycle scales to 1.12 and wobbles about 3.5deg. Transform only, so no layout
+ * shift. Paused while the pill is hovered or focused; off for reduced motion.
+ */
+@keyframes foh-nudge {
   0%,
   85%,
   100% {
     transform: scale(1) rotate(0deg);
   }
-  88% {
+  87.5% {
     transform: scale(1.12) rotate(-3.5deg);
   }
-  91% {
+  90.5% {
     transform: scale(1.12) rotate(3.5deg);
   }
-  94% {
-    transform: scale(1.12) rotate(-3deg);
+  93.5% {
+    transform: scale(1.1) rotate(-2.5deg);
   }
-  97% {
-    transform: scale(1.06) rotate(1.5deg);
+  96.5% {
+    transform: scale(1.05) rotate(1.5deg);
   }
 }
-.pitch-nudge {
+
+.foh-nudge {
   transform-origin: center;
-  animation: pitch-nudge 4s ease-in-out 1s infinite;
+  animation: foh-nudge 4s ease-in-out 2s infinite;
 }
-.pitch-nudge:hover,
-.pitch-nudge:focus,
-.pitch-nudge:focus-visible {
+
+.foh-nudge:hover,
+.foh-nudge:focus,
+.foh-nudge:focus-visible,
+[data-demo-ribbon]:hover .foh-nudge,
+[data-demo-ribbon]:focus-within .foh-nudge {
   animation-play-state: paused;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .pitch-nudge {
+  .foh-nudge {
     animation: none;
   }
 }

@@ -166,29 +166,32 @@ test("no Pleasant Grove company details leak in", () => {
   }
 });
 
-test("real estate pitch is HAI Consulting, never Front of House", () => {
+test("demo pill says Front of House and no page mentions restaurants", () => {
   for (const route of Object.keys(pages)) {
     const text = htmlFor(route).replace(/<script[\s\S]*?<\/script>/g, "");
-    assert.ok(!/front of house|\bFOH\b|fohrestaurants|restaurant/i.test(text), `${route} mentions FOH or restaurants`);
+    assert.ok(!/restaurant/i.test(text), `${route} mentions restaurants`);
   }
-  assert.match(htmlFor("/pitch/"), /HAI Consulting/);
-  assert.match(htmlFor("/"), /Demo concept by/);
+  const home = htmlFor("/");
+  assert.match(home, /Demo concept by <strong[^>]*>Front of House<\/strong>/, "desktop pill copy");
+  assert.match(home, />Demo concept<\/span><strong[^>]*>Front of House<\/strong>/, "phone pill copy");
+  assert.match(home, /FOH Demo/, "minimized tab label");
+  assert.ok(!/Demo concept by <strong[^>]*>HAI Consulting/.test(home), "pill must not say HAI Consulting");
 });
 
-test("pitch button nudge animation exists and is disabled under reduced motion", () => {
+test("foh-nudge animation exists and is disabled under reduced motion", () => {
   const html = htmlFor("/");
   const linked = [...html.matchAll(/href="([^"]+\.css)"/g)].map((m) => read(decode(m[1]).slice(BASE.length)));
   const css = [html, ...linked].join("\n").replace(/\s+/g, "");
-  assert.match(html, /class="pitch-nudge[^"]*"[^>]*href|href="[^"]*\/pitch\/"[^>]*class="pitch-nudge|data-pitch-cta/, "ribbon pitch link is missing");
-  assert.match(css, /@keyframespitch-nudge\{/, "missing @keyframes pitch-nudge");
-  const rule = css.match(/\.pitch-nudge\{[^}]*animation:([^;}]*)/)?.[1] ?? "";
-  assert.ok(rule.includes("pitch-nudge") && rule.includes("4s") && rule.includes("infinite"), `missing .pitch-nudge animation rule (${rule})`);
-  assert.match(css, /scale\(1\.12\)/, "nudge should scale to 1.12");
-  assert.match(css, /\.pitch-nudge:hover[^{]*\{[^}]*animation-play-state:paused/, "animation should pause on hover/focus");
+  assert.match(html, /data-pitch-cta/, "pill pitch link is missing");
+  assert.match(css, /@keyframesfoh-nudge\{/, "missing @keyframes foh-nudge");
+  const rule = css.match(/\.foh-nudge\{[^}]*animation:([^;}]*)/)?.[1] ?? "";
+  assert.ok(rule.includes("foh-nudge") && rule.includes("4s") && rule.includes("infinite"), `missing .foh-nudge animation rule (${rule})`);
+  assert.match(css, /scale\(1\.12\)rotate\(-3\.5deg\)/, "nudge should scale to 1.12 and rotate 3.5deg");
+  assert.match(css, /\.foh-nudge:hover[^{]*\{[^}]*animation-play-state:paused/, "animation should pause on hover/focus");
   const reduced = [...css.matchAll(/@media\(prefers-reduced-motion:reduce\)\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]);
   assert.ok(
-    reduced.some((block) => /\.pitch-nudge\{animation:none/.test(block)),
-    "prefers-reduced-motion must set .pitch-nudge { animation: none }",
+    reduced.some((block) => /\.foh-nudge\{animation:none/.test(block)),
+    "prefers-reduced-motion must set .foh-nudge { animation: none }",
   );
 });
 

@@ -74,55 +74,120 @@ test("pitch comparison uses the table on desktop with sensible columns", { skip:
   assert.ok(cols.cells[1] >= cols.tableWidth * 0.3 && cols.cells[2] >= cols.tableWidth * 0.3, `content columns: ${cols.cells}`);
 });
 
-test("demo ribbon fits 320 to 430px with 48px tap targets", { skip: !chromePath && "Chrome not found" }, async () => {
+const RIBBON_KEY = "foh-demo-ribbon";
+
+async function ribbonBoxes(page) {
+  return page.evaluate(() => {
+    const box = (el) => (el && el.checkVisibility() ? el.getBoundingClientRect().toJSON() : null);
+    return {
+      vw: window.innerWidth,
+      full: box(document.querySelector("[data-ribbon-full]")),
+      tab: box(document.querySelector("[data-ribbon-tab]")),
+      cta: box(document.querySelector("[data-pitch-cta]")),
+      minimize: box(document.querySelector("[data-ribbon-minimize]")),
+      expand: box(document.querySelector("[data-ribbon-expand]")),
+      ctaMini: box(document.querySelector("[data-pitch-cta-mini]")),
+      scrollWidth: document.documentElement.scrollWidth,
+    };
+  });
+}
+
+test("demo pill fits 320 to 430px with 48px tap targets in both states", { skip: !chromePath && "Chrome not found" }, async () => {
   for (const width of widths) {
-    const page = await browser.newPage({ viewport: { width, height: 844 } });
+    const ctx = await browser.newContext({ viewport: { width, height: 844 } });
+    const page = await ctx.newPage();
     await page.goto(`${ORIGIN}/`, { waitUntil: "load" });
-    const r = await page.evaluate(() => {
-      const box = (el) => el.getBoundingClientRect();
-      const ribbon = document.querySelector("[data-demo-ribbon]");
-      const cta = ribbon.querySelector("[data-pitch-cta]");
-      const close = ribbon.querySelector("button");
-      return {
-        vw: window.innerWidth,
-        ribbon: box(ribbon).toJSON(),
-        cta: box(cta).toJSON(),
-        close: box(close).toJSON(),
-        fontSize: parseFloat(getComputedStyle(cta).fontSize),
-        scrollWidth: document.documentElement.scrollWidth,
-      };
-    });
-    await page.close();
-    assert.ok(r.ribbon.left >= 0 && r.ribbon.right <= r.vw, `ribbon overflows at ${width}px`);
-    assert.ok(r.cta.height >= 48 && r.close.height >= 48 && r.close.width >= 48, `tap targets under 48px at ${width}px`);
-    assert.ok(r.cta.right <= r.ribbon.right && r.close.right <= r.ribbon.right, `buttons spill out of the ribbon at ${width}px`);
-    assert.ok(r.fontSize >= 16.5, `pitch button font is ${r.fontSize}px, expected about 1.4x the old 12.8px`);
+    const r = await ribbonBoxes(page);
+    assert.ok(r.full && !r.tab, `full pill should show by default at ${width}px`);
+    assert.ok(r.full.left >= 0 && r.full.right <= r.vw, `pill overflows at ${width}px`);
+    assert.ok(r.cta.height >= 48 && r.cta.width >= 48, `Pitch target under 48px at ${width}px`);
+    assert.ok(r.minimize.height >= 48 && r.minimize.width >= 48, `minimize target under 48px at ${width}px`);
+    assert.ok(r.cta.right <= r.full.right && r.minimize.right <= r.full.right, `controls spill out of the pill at ${width}px`);
     assert.ok(r.scrollWidth <= width, `horizontal scroll at ${width}px`);
+
+    await page.getByRole("button", { name: "Minimize demo banner" }).click();
+    const m = await ribbonBoxes(page);
+    assert.ok(m.tab && !m.full, `tab should replace the pill at ${width}px`);
+    assert.ok(m.tab.left >= 0 && m.tab.right <= m.vw, `tab overflows at ${width}px`);
+    assert.ok(m.expand.height >= 48 && m.ctaMini.height >= 48 && m.ctaMini.width >= 48, `tab targets under 48px at ${width}px`);
+    assert.ok(Math.abs(m.tab.left - r.full.left) < 1 && Math.abs(m.tab.bottom - r.full.bottom) < 1, "tab should sit in the same corner");
+    await ctx.close();
   }
 });
 
-test("pitch button animates, pauses on hover and focus, and stops under reduced motion", { skip: !chromePath && "Chrome not found" }, async () => {
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+test("demo pill cannot be removed, only minimized and expanded, and the state persists", { skip: !chromePath && "Chrome not found" }, async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
   await page.goto(`${ORIGIN}/`, { waitUntil: "load" });
-  const cta = page.locator("[data-pitch-cta]");
-  const style = () => cta.evaluate((el) => {
+
+  const removeControls = await page.locator("[data-demo-ribbon] button, [data-demo-ribbon] a").evaluateAll((els) =>
+    els.map((el) => el.getAttribute("aria-label") || el.textContent).filter((l) => /dismiss|close|remove|hide/i.test(l ?? "")),
+  );
+  assert.deepEqual(removeControls, [], "no control may remove the pill");
+
+  await page.evaluate((key) => localStorage.setItem(key, "off"), RIBBON_KEY);
+  await page.reload({ waitUntil: "load" });
+  assert.ok((await ribbonBoxes(page)).full, "a stale 'off' value must not hide the pill");
+
+  await page.getByRole("button", { name: "Minimize demo banner" }).click();
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Expand demo banner", null, { timeout: 2000 });
+  assert.equal(await page.evaluate((key) => localStorage.getItem(key), RIBBON_KEY), "min");
+  assert.match(await page.locator("[data-ribbon-tab]").innerText(), /FOH Demo/);
+
+  await page.reload({ waitUntil: "load" });
+  let r = await ribbonBoxes(page);
+  assert.ok(r.tab && !r.full, "minimized state should persist across reloads");
+  await page.goto(`${ORIGIN}/services/`, { waitUntil: "load" });
+  r = await ribbonBoxes(page);
+  assert.ok(r.tab && !r.full, "minimized state should persist across pages");
+
+  await page.getByRole("button", { name: "Expand demo banner" }).click();
+  r = await ribbonBoxes(page);
+  assert.ok(r.full && !r.tab, "expanding should restore the full pill");
+  assert.equal(await page.evaluate((key) => localStorage.getItem(key), RIBBON_KEY), null);
+  await page.reload({ waitUntil: "load" });
+  assert.ok((await ribbonBoxes(page)).full, "expanded state should persist across reloads");
+
+  for (const path of ["/", "/pitch/"]) {
+    await page.goto(`${ORIGIN}${path}`, { waitUntil: "load" });
+    const present = await page.locator("[data-demo-ribbon]").count();
+    if (path === "/") assert.equal(present, 1, "pill must be on the site pages");
+  }
+  await ctx.close();
+});
+
+test("Pitch nudges in both states, pauses on hover and focus, and stops under reduced motion", { skip: !chromePath && "Chrome not found" }, async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.goto(`${ORIGIN}/`, { waitUntil: "load" });
+  const style = (sel) => page.locator(sel).evaluate((el) => {
     const cs = getComputedStyle(el);
     return { name: cs.animationName, duration: cs.animationDuration, state: cs.animationPlayState };
   });
-  const running = await style();
-  assert.equal(running.name, "pitch-nudge");
+  const running = await style("[data-pitch-cta]");
+  assert.equal(running.name, "foh-nudge");
   assert.equal(running.duration, "4s");
   assert.equal(running.state, "running");
-  await cta.hover();
-  assert.equal((await style()).state, "paused", "should pause on hover");
-  await page.mouse.move(0, 0);
-  await cta.focus();
-  assert.equal((await style()).state, "paused", "should pause on focus");
-  await page.close();
+  await page.locator("[data-pitch-cta]").hover();
+  assert.equal((await style("[data-pitch-cta]")).state, "paused", "should pause on hover");
+  await page.mouse.move(5, 5);
+  await page.locator("[data-pitch-cta]").focus();
+  assert.equal((await style("[data-pitch-cta]")).state, "paused", "should pause on focus");
+  await page.locator("[data-pitch-cta]").blur();
 
-  const reduced = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
-  await reduced.goto(`${ORIGIN}/`, { waitUntil: "load" });
-  const name = await reduced.locator("[data-pitch-cta]").evaluate((el) => getComputedStyle(el).animationName);
+  await page.getByRole("button", { name: "Minimize demo banner" }).click();
+  await page.waitForFunction(() => document.activeElement?.matches("[data-ribbon-expand]"), null, { timeout: 2000 });
+  await page.locator("[data-ribbon-expand]").blur();
+  await page.mouse.move(5, 5);
+  const mini = await style("[data-pitch-cta-mini]");
+  assert.equal(mini.name, "foh-nudge", "tab Pitch arrow should nudge too");
+  assert.equal(mini.state, "running");
+  await ctx.close();
+
+  const reduced = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
+  const rp = await reduced.newPage();
+  await rp.goto(`${ORIGIN}/`, { waitUntil: "load" });
+  const name = await rp.locator("[data-pitch-cta]").evaluate((el) => getComputedStyle(el).animationName);
   await reduced.close();
   assert.equal(name, "none", "animation must be off under prefers-reduced-motion");
 });

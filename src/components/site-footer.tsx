@@ -10,7 +10,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-night text-sand">
+    <footer className="bg-night pb-24 text-sand md:pb-24">
       <div className="container-page grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
         <div>
           <div className="inline-block rounded-xl bg-cream px-3 py-2">
@@ -79,7 +79,7 @@ export function SiteFooter() {
             &copy; {year} {company.name}. All rights reserved.
           </p>
           <p>
-            Demo concept by HAI Consulting, not the official Utah First site.{" "}
+            Demo concept by Front of House, not the official Utah First site.{" "}
             <Link className="text-sand underline" href="/pitch/" prefetch={false}>About this demo</Link>
           </p>
         </div>

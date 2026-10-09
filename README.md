@@ -2,7 +2,7 @@
 
 A sales-pitch demo built by **HAI Consulting** for Utah First Property Management (Wilprop, LLC; principal broker Bryan Wilson; [utah1st.com](https://www.utah1st.com)), with offices in St. George and Cedar City, Utah.
 
-**This is not the official Utah First site.** It is noindexed, and a dismissible "Demo concept by HAI Consulting" ribbon appears on every page. The Pleasant Grove company "Utah First Realty and Property Management" is a separate business and does not appear anywhere in the demo.
+**This is not the official Utah First site.** It is noindexed, and a "Demo concept by Front of House" pill (the same design as the Sterling demo) appears on every page. It can be minimized to a small "FOH Demo" tab, but never removed; the state is kept in localStorage. The Pleasant Grove company "Utah First Realty and Property Management" is a separate business and does not appear anywhere in the demo.
 
 - Live demo (GitHub Pages): https://haiconsulting.github.io/hai-demo-utah-first-pm-st-george/
 - Internal pitch page: `/pitch/` (compares the current Duda site with the demo and lays out HAI's offer)
@@ -79,9 +79,9 @@ NEXT_PUBLIC_BASE_PATH=/hai-demo-utah-first-pm-st-george npm test
 - Every internal `href`/`src` carries the base path and resolves to a real file.
 - Every JSON-LD block parses, and offices are `RealEstateAgent` + `LocalBusiness` with a full `PostalAddress`, with no unverified phone or ratings.
 - The sitemap, robots.txt and llms.txt use absolute base-path URLs.
-- No Pleasant Grove details or Front of House references appear, and `/pitch` has no em dashes.
+- No Pleasant Grove details or restaurant references appear, the pill says Front of House, the `foh-nudge` rule ships with a reduced-motion override, and `/pitch` has no em dashes.
 
-It then runs `tests/mobile-layout.test.mjs` with Playwright and the locally installed Chrome (skipped if Chrome isn't found; set `CHROME_PATH` to point at it). At 390x844, every `/pitch` comparison row must be a stacked card at least 90% of the viewport width, and the desktop table must have sensible column widths. Every page is checked for horizontal overflow at 320, 375, 390 and 430px.
+It then runs `tests/mobile-layout.test.mjs` with Playwright and the locally installed Chrome (skipped if Chrome isn't found; set `CHROME_PATH` to point at it). At 390x844, every `/pitch` comparison row must be a stacked card at least 90% of the viewport width, and the desktop table must have sensible column widths. Every page is checked for horizontal overflow at 320, 375, 390 and 430px. The demo pill must fit at those widths with 48px tap targets in both states, have no remove control, minimize and expand correctly, persist its state across reloads and pages, and keep the Pitch nudge running in both states (off under reduced motion).
 
 ## Configuration
 
@@ -119,5 +119,6 @@ Mobile performance is held back by the simulated slow-4G download of the React r
 ## Brand notes
 
 - Utah First: their logo and real photos from utah1st.com, set in a red-rock and desert palette.
-- HAI Consulting styling appears only on the ribbon and `/pitch`. It uses the warm Ink, Ember and Bone tokens, Cormorant and Inter, and no em dashes. Ember text and buttons use Ember Deep (#A8472B) to meet WCAG AA contrast.
-- Front of House is HAI's restaurant line and is not used for this real estate pitch.
+- The demo pill uses the Front of House design from the Sterling demo: Ink pill, awning mark, Ember Deep "Pitch" button with the `foh-nudge` animation (4s cycle, 1.12 scale, about 3.5deg wobble, paused on hover and focus, off under reduced motion).
+- `/pitch` is signed by HAI Consulting and uses the same warm Ink, Ember and Bone tokens with Cormorant and Inter, and no em dashes. Ember text and buttons use Ember Deep (#A8472B) to meet WCAG AA contrast.
+- No page mentions restaurants (a test enforces this).
