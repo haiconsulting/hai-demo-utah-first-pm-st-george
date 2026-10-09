@@ -175,6 +175,23 @@ test("real estate pitch is HAI Consulting, never Front of House", () => {
   assert.match(htmlFor("/"), /Demo concept by/);
 });
 
+test("pitch button nudge animation exists and is disabled under reduced motion", () => {
+  const html = htmlFor("/");
+  const linked = [...html.matchAll(/href="([^"]+\.css)"/g)].map((m) => read(decode(m[1]).slice(BASE.length)));
+  const css = [html, ...linked].join("\n").replace(/\s+/g, "");
+  assert.match(html, /class="pitch-nudge[^"]*"[^>]*href|href="[^"]*\/pitch\/"[^>]*class="pitch-nudge|data-pitch-cta/, "ribbon pitch link is missing");
+  assert.match(css, /@keyframespitch-nudge\{/, "missing @keyframes pitch-nudge");
+  const rule = css.match(/\.pitch-nudge\{[^}]*animation:([^;}]*)/)?.[1] ?? "";
+  assert.ok(rule.includes("pitch-nudge") && rule.includes("4s") && rule.includes("infinite"), `missing .pitch-nudge animation rule (${rule})`);
+  assert.match(css, /scale\(1\.12\)/, "nudge should scale to 1.12");
+  assert.match(css, /\.pitch-nudge:hover[^{]*\{[^}]*animation-play-state:paused/, "animation should pause on hover/focus");
+  const reduced = [...css.matchAll(/@media\(prefers-reduced-motion:reduce\)\{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]);
+  assert.ok(
+    reduced.some((block) => /\.pitch-nudge\{animation:none/.test(block)),
+    "prefers-reduced-motion must set .pitch-nudge { animation: none }",
+  );
+});
+
 test("HAI pitch copy has no em dashes", () => {
   const text = htmlFor("/pitch/").replace(/<script[\s\S]*?<\/script>/g, "");
   assert.ok(!text.includes("\u2014") && !text.includes("&mdash;"), "em dash found on /pitch");

@@ -175,3 +175,48 @@
 html[data-ribbon="off"] [data-demo-ribbon] {
   display: none;
 }
+
+/* Room below the footer so the fixed ribbon never hides the last content. */
+html:not([data-ribbon="off"]) body:has([data-demo-ribbon]) {
+  padding-bottom: 8.5rem;
+}
+@media (min-width: 640px) {
+  html:not([data-ribbon="off"]) body:has([data-demo-ribbon]) {
+    padding-bottom: 5.5rem;
+  }
+}
+
+/* Attention nudge on the pitch button: rests, then scales and wobbles for ~600ms every 4s. */
+@keyframes pitch-nudge {
+  0%,
+  85%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  88% {
+    transform: scale(1.12) rotate(-3.5deg);
+  }
+  91% {
+    transform: scale(1.12) rotate(3.5deg);
+  }
+  94% {
+    transform: scale(1.12) rotate(-3deg);
+  }
+  97% {
+    transform: scale(1.06) rotate(1.5deg);
+  }
+}
+.pitch-nudge {
+  transform-origin: center;
+  animation: pitch-nudge 4s ease-in-out 1s infinite;
+}
+.pitch-nudge:hover,
+.pitch-nudge:focus,
+.pitch-nudge:focus-visible {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pitch-nudge {
+    animation: none;
+  }
+}
