@@ -1,0 +1,177 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-display: var(--font-display-face), Georgia, "Times New Roman", serif;
+  --font-heading: var(--font-display);
+
+  --color-sand: #f7eee2;
+  --color-sand-2: #efdfc8;
+  --color-cream: #fffaf3;
+  --color-rock: #b4482b;
+  --color-rock-deep: #7a2e1d;
+  --color-sun: #e9a23b;
+  --color-sage: #4e6b4a;
+  --color-night: #2a1a14;
+  --color-text: #3b2a22;
+  --color-muted-ink: #6e5a4d;
+  --color-line: #e3cdb0;
+  --color-brand-red: #bd0004;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+:root {
+  --background: #f7eee2;
+  --foreground: #3b2a22;
+  --card: #fffaf3;
+  --card-foreground: #3b2a22;
+  --popover: #fffaf3;
+  --popover-foreground: #3b2a22;
+  --primary: #b4482b;
+  --primary-foreground: #ffffff;
+  --secondary: #efdfc8;
+  --secondary-foreground: #2a1a14;
+  --muted: #efdfc8;
+  --muted-foreground: #6e5a4d;
+  --accent: #efdfc8;
+  --accent-foreground: #2a1a14;
+  --destructive: #a32014;
+  --border: #e3cdb0;
+  --input: #cfb594;
+  --ring: #7a2e1d;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-night);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  h1 em,
+  h2 em {
+    font-family: var(--font-display-italic), var(--font-display);
+  }
+  a {
+    text-underline-offset: 0.18em;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-rock-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.1rem, 4vw, 2.5rem);
+  }
+  .kicker {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-rock);
+  }
+  .band-stripes {
+    background-color: var(--color-sand-2);
+    background-image: repeating-linear-gradient(0deg, transparent 0 38px, rgb(180 72 43 / 0.05) 38px 40px);
+  }
+  .prose-uf p + p {
+    margin-top: 1rem;
+  }
+}
+
+/* HAI Consulting brand, used only on /pitch. */
+.hai h1,
+.hai h2,
+.hai h3 {
+  font-family: var(--font-hai-display), Georgia, "Times New Roman", serif;
+  color: #221c18;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+.hai h1 em,
+.hai h2 em {
+  font-family: inherit;
+  color: #c75b39;
+  font-style: italic;
+}
+.hai .hai-kicker {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #a8472b;
+}
+.hai :focus-visible {
+  outline: 2.5px solid #c75b39;
+  outline-offset: 3px;
+}
+
+/* Demo ribbon stays hidden after dismissal without a layout flash. */
+html[data-ribbon="off"] [data-demo-ribbon] {
+  display: none;
+}
