@@ -81,6 +81,8 @@ NEXT_PUBLIC_BASE_PATH=/hai-demo-utah-first-pm-st-george npm test
 - The sitemap, robots.txt and llms.txt use absolute base-path URLs.
 - No Pleasant Grove details or Front of House references appear, and `/pitch` has no em dashes.
 
+It then runs `tests/mobile-layout.test.mjs` with Playwright and the locally installed Chrome (skipped if Chrome isn't found; set `CHROME_PATH` to point at it). At 390x844, every `/pitch` comparison row must be a stacked card at least 90% of the viewport width, and the desktop table must have sensible column widths. Every page is checked for horizontal overflow at 320, 375, 390 and 430px.
+
 ## Configuration
 
 | Env var | Default | Notes |

@@ -63,7 +63,7 @@ export default function PitchPage() {
   return (
     <>
       <div className="bg-[#221c18] text-[#f4ecdd]">
-        <div className="mx-auto flex max-w-[1140px] flex-wrap items-center justify-between gap-3 px-[clamp(1.25rem,4vw,3rem)] py-3 text-sm">
+        <div className="mx-auto flex max-w-[1140px] flex-wrap items-center justify-between gap-3 px-[clamp(1rem,4vw,3rem)] py-3 text-sm">
           <p>
             <strong className="font-semibold">HAI Consulting</strong>
             <span className="text-[#c9bba0]"> &middot; Prepared for Utah First Property Management</span>
@@ -76,7 +76,7 @@ export default function PitchPage() {
 
       <main id="main">
         <header className="border-b border-[#e4d9c4]">
-          <div className="mx-auto max-w-[1140px] px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
+          <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
             <p className="hai-kicker">For Bryan Wilson, Principal Broker</p>
             <h1 className="mt-4 max-w-4xl text-[clamp(2.6rem,6vw,4.4rem)] font-bold">
               Your reviews are great. Your website is <em>hiding</em> them.
@@ -104,7 +104,7 @@ export default function PitchPage() {
         </header>
 
         <section className="border-b border-[#e4d9c4] bg-[#f4ecdd]" aria-labelledby="compare-title">
-          <div className="mx-auto max-w-[1140px] px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
+          <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
             <p className="hai-kicker">Current site vs. demo</p>
             <h2 id="compare-title" className="mt-3 text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold">
               What changes, <em>line</em> by line
@@ -113,30 +113,60 @@ export default function PitchPage() {
               Audit of utah1st.com on Oct 9, 2026, from page source and public data. The current site runs on the Duda builder
               with AppFolio for listings and portals.
             </p>
-            <div className="mt-8 overflow-hidden rounded-[14px] border border-[#e4d9c4] bg-white">
-              <table className="w-full border-collapse text-left text-[0.95rem]">
+            <ul className="mt-8 grid gap-3 md:hidden" aria-label="Comparison of the current Utah First website and the demo">
+              {comparison.map((r) => (
+                <li
+                  key={r.area}
+                  data-compare-row
+                  className="w-full min-w-0 rounded-[14px] border border-[#e4d9c4] bg-white p-4"
+                >
+                  <h3 className="text-xl font-semibold">{r.area}</h3>
+                  <div className="mt-3 flex gap-2.5">
+                    <X className="mt-1 size-4 shrink-0 text-[#b23122]" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold tracking-[0.14em] text-[#6b5f52] uppercase">Today</p>
+                      <p className="mt-0.5 text-[0.95rem] break-words">{r.now}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex gap-2.5 border-t border-[#efe7d8] pt-3">
+                    <Check className="mt-1 size-4 shrink-0 text-[#4e6b4a]" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold tracking-[0.14em] text-[#4e6b4a] uppercase">Demo</p>
+                      <p className="mt-0.5 text-[0.95rem] break-words">{r.demo}</p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 hidden overflow-hidden rounded-[14px] border border-[#e4d9c4] bg-white md:block">
+              <table className="w-full table-fixed border-collapse text-left text-[0.95rem]">
                 <caption className="sr-only">Comparison of the current Utah First website and the demo</caption>
+                <colgroup>
+                  <col className="w-[20%]" />
+                  <col className="w-[40%]" />
+                  <col className="w-[40%]" />
+                </colgroup>
                 <thead className="bg-[#221c18] text-[#f4ecdd]">
                   <tr>
-                    <th scope="col" className="w-[22%] px-4 py-3 font-semibold">Area</th>
+                    <th scope="col" className="px-4 py-3 font-semibold">Area</th>
                     <th scope="col" className="px-4 py-3 font-semibold">utah1st.com today</th>
                     <th scope="col" className="px-4 py-3 font-semibold">Demo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparison.map((r) => (
-                    <tr key={r.area} className="border-t border-[#efe7d8] align-top max-md:grid max-md:grid-cols-1">
-                      <th scope="row" className="px-4 pt-4 pb-1 font-semibold text-[#221c18] md:py-4">{r.area}</th>
-                      <td className="px-4 py-1 md:py-4">
+                    <tr key={r.area} className="border-t border-[#efe7d8] align-top">
+                      <th scope="row" className="px-4 py-4 font-semibold break-words text-[#221c18]">{r.area}</th>
+                      <td className="px-4 py-4">
                         <span className="flex gap-2">
                           <X className="mt-1 size-4 shrink-0 text-[#b23122]" aria-hidden="true" />
-                          <span><span className="sr-only">Today: </span>{r.now}</span>
+                          <span className="min-w-0 break-words"><span className="sr-only">Today: </span>{r.now}</span>
                         </span>
                       </td>
-                      <td className="px-4 pt-1 pb-4 md:py-4">
+                      <td className="px-4 py-4">
                         <span className="flex gap-2">
                           <Check className="mt-1 size-4 shrink-0 text-[#4e6b4a]" aria-hidden="true" />
-                          <span><span className="sr-only">Demo: </span>{r.demo}</span>
+                          <span className="min-w-0 break-words"><span className="sr-only">Demo: </span>{r.demo}</span>
                         </span>
                       </td>
                     </tr>
@@ -156,7 +186,7 @@ export default function PitchPage() {
                 <h3 className="text-[1.4rem] font-semibold">Speed of the demo</h3>
                 {demoLighthouse ? (
                   <>
-                    <ul className="mt-3 grid grid-cols-4 gap-2 text-center">
+                    <ul className="mt-3 grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
                       {demoLighthouse.scores.map((s) => (
                         <li key={s.label} className="rounded-[9px] bg-[#f4ecdd] px-2 py-3">
                           <span className="block font-[family-name:var(--font-hai-display)] text-3xl font-bold text-[#221c18]">{s.value}</span>
@@ -175,7 +205,7 @@ export default function PitchPage() {
         </section>
 
         <section className="border-b border-[#e4d9c4]" aria-labelledby="evidence-title">
-          <div className="mx-auto max-w-[1140px] px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
+          <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
             <p className="hai-kicker">Small details, big signal</p>
             <h2 id="evidence-title" className="mt-3 text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold">
               What an owner <em>notices</em>
@@ -192,7 +222,7 @@ export default function PitchPage() {
         </section>
 
         <section className="border-b border-[#e4d9c4] bg-[#2e231c] text-[#f4ecdd]" aria-labelledby="gap-title">
-          <div className="mx-auto grid max-w-[1140px] gap-10 px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)] lg:grid-cols-[1fr_1.1fr]">
+          <div className="mx-auto grid max-w-[1140px] gap-10 px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)] lg:grid-cols-[1fr_1.1fr]">
             <div>
               <p className="hai-kicker !text-[#d97b57]">Competitor gap</p>
               <h2 id="gap-title" className="mt-3 text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold !text-white">
@@ -220,7 +250,7 @@ export default function PitchPage() {
         </section>
 
         <section className="border-b border-[#e4d9c4]" aria-labelledby="rep-title">
-          <div className="mx-auto max-w-[1140px] px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,6vw,5rem)]">
+          <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,6vw,5rem)]">
             <p className="hai-kicker">Reputation</p>
             <h2 id="rep-title" className="mt-3 text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold">
               Strong on Google, <em>mixed</em> elsewhere
@@ -234,7 +264,7 @@ export default function PitchPage() {
         </section>
 
         <section id="offer" className="border-b border-[#e4d9c4] bg-[#f4ecdd]" aria-labelledby="offer-title">
-          <div className="mx-auto max-w-[1140px] px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
+          <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)]">
             <p className="hai-kicker">The offer</p>
             <h2 id="offer-title" className="mt-3 text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold">
               A site you <em>own</em>, not a builder you rent
@@ -289,7 +319,7 @@ export default function PitchPage() {
         </section>
 
         <section aria-labelledby="next-title">
-          <div className="mx-auto grid max-w-[1140px] gap-10 px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)] lg:grid-cols-2">
+          <div className="mx-auto grid max-w-[1140px] gap-10 px-[clamp(1rem,4vw,3rem)] py-[clamp(3.5rem,8vw,6.5rem)] lg:grid-cols-2">
             <div>
               <p className="hai-kicker">Next step</p>
               <h2 id="next-title" className="mt-3 text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold">
@@ -331,7 +361,7 @@ export default function PitchPage() {
       </main>
 
       <footer className="border-t border-[#e4d9c4] bg-[#f4ecdd]">
-        <div className="mx-auto max-w-[1140px] px-[clamp(1.25rem,4vw,3rem)] py-8 text-sm text-[#6b5f52]">
+        <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-8 text-sm text-[#6b5f52]">
           Demo concept by HAI Consulting. Not affiliated with or approved by Utah First Property Management or Wilprop, LLC.
           Facts come from public sources gathered Oct 9, 2026. Utah First Realty and Property Management in Pleasant Grove is a
           separate company and is not part of this demo.
