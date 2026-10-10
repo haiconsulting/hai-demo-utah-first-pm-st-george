@@ -360,7 +360,7 @@ export default function PitchPage() {
         </section>
       </main>
 
-      <footer className="border-t border-[#e4d9c4] bg-[#f4ecdd]">
+      <footer className="border-t border-[#e4d9c4] bg-[#f4ecdd] pb-24">
         <div className="mx-auto max-w-[1140px] px-[clamp(1rem,4vw,3rem)] py-8 text-sm text-[#6b5f52]">
           Demo concept by HAI Consulting. Not affiliated with or approved by Utah First Property Management or Wilprop, LLC.
           Facts come from public sources gathered Oct 9, 2026. Utah First Realty and Property Management in Pleasant Grove is a

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Public_Sans } from "next/font/google";
-import { ribbonBootScript } from "@/components/demo-ribbon";
+import { DemoPill } from "@/components/foh/demo-pill";
 import { company, NOINDEX, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -48,10 +48,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${display.variable} ${displayItalic.variable} ${body.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: ribbonBootScript }} />
-      </head>
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        {children}
+        <DemoPill />
+      </body>
     </html>
   );
 }

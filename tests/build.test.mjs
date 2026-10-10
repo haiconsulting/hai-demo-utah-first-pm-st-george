@@ -175,6 +175,8 @@ test("demo pill says Front of House and no page mentions restaurants", () => {
   assert.match(home, /Demo concept by <strong[^>]*>Front of House<\/strong>/, "desktop pill copy");
   assert.match(home, />Demo concept<\/span><strong[^>]*>Front of House<\/strong>/, "phone pill copy");
   assert.match(home, /FOH Demo/, "minimized tab label");
+  assert.match(home, /\.foh-pill\{position:fixed;bottom:calc\(\.75rem \+ env\(safe-area-inset-bottom\)\)/, "12px phone offset");
+  assert.ok(!/dismiss/i.test(home.match(/<aside[^>]*foh-pill[\s\S]*?<\/aside>/g)?.join("") ?? ""), "pill has no dismiss control");
   assert.ok(!/Demo concept by <strong[^>]*>HAI Consulting/.test(home), "pill must not say HAI Consulting");
 });
 
@@ -182,7 +184,9 @@ test("foh-nudge animation exists and is disabled under reduced motion", () => {
   const html = htmlFor("/");
   const linked = [...html.matchAll(/href="([^"]+\.css)"/g)].map((m) => read(decode(m[1]).slice(BASE.length)));
   const css = [html, ...linked].join("\n").replace(/\s+/g, "");
+  assert.match(html, /class="foh-pill foh-pill--full"/, "demo pill is missing");
   assert.match(html, /data-pitch-cta/, "pill pitch link is missing");
+  assert.ok(html.includes(`href="${BASE}/pitch/"`), "pill pitch link must respect the base path");
   assert.match(css, /@keyframesfoh-nudge\{/, "missing @keyframes foh-nudge");
   const rule = css.match(/\.foh-nudge\{[^}]*animation:([^;}]*)/)?.[1] ?? "";
   assert.ok(rule.includes("foh-nudge") && rule.includes("4s") && rule.includes("infinite"), `missing .foh-nudge animation rule (${rule})`);

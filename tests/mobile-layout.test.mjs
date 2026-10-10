@@ -74,19 +74,21 @@ test("pitch comparison uses the table on desktop with sensible columns", { skip:
   assert.ok(cols.cells[1] >= cols.tableWidth * 0.3 && cols.cells[2] >= cols.tableWidth * 0.3, `content columns: ${cols.cells}`);
 });
 
-const RIBBON_KEY = "foh-demo-ribbon";
+const PILL_KEY = "foh-demo-pill";
+const LEGACY_KEY = "foh-demo-ribbon";
 
 async function ribbonBoxes(page) {
   return page.evaluate(() => {
     const box = (el) => (el && el.checkVisibility() ? el.getBoundingClientRect().toJSON() : null);
     return {
       vw: window.innerWidth,
-      full: box(document.querySelector("[data-ribbon-full]")),
-      tab: box(document.querySelector("[data-ribbon-tab]")),
-      cta: box(document.querySelector("[data-pitch-cta]")),
-      minimize: box(document.querySelector("[data-ribbon-minimize]")),
-      expand: box(document.querySelector("[data-ribbon-expand]")),
-      ctaMini: box(document.querySelector("[data-pitch-cta-mini]")),
+      full: box(document.querySelector(".foh-pill--full")),
+      tab: box(document.querySelector(".foh-pill--tab")),
+      cta: box(document.querySelector(".foh-pill--full [data-pitch-cta]")),
+      minimize: box(document.querySelector("[data-foh-pill-minimize]")),
+      expand: box(document.querySelector("[data-foh-pill-expand]")),
+      ctaMini: box(document.querySelector(".foh-pill--tab [data-pitch-cta]")),
+      count: document.querySelectorAll(".foh-pill").length,
       scrollWidth: document.documentElement.scrollWidth,
     };
   });
@@ -125,14 +127,18 @@ test("demo pill cannot be removed, only minimized and expanded, and the state pe
   );
   assert.deepEqual(removeControls, [], "no control may remove the pill");
 
-  await page.evaluate((key) => localStorage.setItem(key, "off"), RIBBON_KEY);
+  await page.evaluate((key) => localStorage.setItem(key, "off"), LEGACY_KEY);
   await page.reload({ waitUntil: "load" });
-  assert.ok((await ribbonBoxes(page)).full, "a stale 'off' value must not hide the pill");
+  let legacy = await ribbonBoxes(page);
+  assert.ok(legacy.tab && !legacy.full, "a legacy dismissal must only minimize the pill, never hide it");
+  await page.getByRole("button", { name: /^Expand demo banner/ }).click();
+  await page.evaluate((key) => localStorage.removeItem(key), LEGACY_KEY);
+  assert.equal((await ribbonBoxes(page)).count, 2, "exactly one pill (full and tab variants) per page");
 
   await page.getByRole("button", { name: "Minimize demo banner" }).click();
-  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Expand demo banner", null, { timeout: 2000 });
-  assert.equal(await page.evaluate((key) => localStorage.getItem(key), RIBBON_KEY), "min");
-  assert.match(await page.locator("[data-ribbon-tab]").innerText(), /FOH Demo/);
+  await page.waitForFunction(() => document.activeElement?.hasAttribute("data-foh-pill-expand"), null, { timeout: 2000 });
+  assert.equal(await page.evaluate((key) => localStorage.getItem(key), PILL_KEY), "min");
+  assert.match(await page.locator(".foh-pill--tab").innerText(), /FOH Demo/);
 
   await page.reload({ waitUntil: "load" });
   let r = await ribbonBoxes(page);
@@ -141,17 +147,17 @@ test("demo pill cannot be removed, only minimized and expanded, and the state pe
   r = await ribbonBoxes(page);
   assert.ok(r.tab && !r.full, "minimized state should persist across pages");
 
-  await page.getByRole("button", { name: "Expand demo banner" }).click();
+  await page.getByRole("button", { name: /^Expand demo banner/ }).click();
   r = await ribbonBoxes(page);
   assert.ok(r.full && !r.tab, "expanding should restore the full pill");
-  assert.equal(await page.evaluate((key) => localStorage.getItem(key), RIBBON_KEY), null);
+  assert.equal(await page.evaluate((key) => localStorage.getItem(key), PILL_KEY), "open");
+  assert.equal(await page.evaluate(() => document.activeElement?.hasAttribute("data-foh-pill-minimize")), true);
   await page.reload({ waitUntil: "load" });
   assert.ok((await ribbonBoxes(page)).full, "expanded state should persist across reloads");
 
-  for (const path of ["/", "/pitch/"]) {
+  for (const path of ["/", "/pitch/", "/es/"]) {
     await page.goto(`${ORIGIN}${path}`, { waitUntil: "load" });
-    const present = await page.locator("[data-demo-ribbon]").count();
-    if (path === "/") assert.equal(present, 1, "pill must be on the site pages");
+    assert.equal(await page.locator(".foh-pill").count(), 2, `pill must be rendered once on ${path}`);
   }
   await ctx.close();
 });
@@ -164,22 +170,23 @@ test("Pitch nudges in both states, pauses on hover and focus, and stops under re
     const cs = getComputedStyle(el);
     return { name: cs.animationName, duration: cs.animationDuration, state: cs.animationPlayState };
   });
-  const running = await style("[data-pitch-cta]");
+  const full = ".foh-pill--full [data-pitch-cta]";
+  const running = await style(full);
   assert.equal(running.name, "foh-nudge");
   assert.equal(running.duration, "4s");
   assert.equal(running.state, "running");
-  await page.locator("[data-pitch-cta]").hover();
-  assert.equal((await style("[data-pitch-cta]")).state, "paused", "should pause on hover");
+  await page.locator(full).hover();
+  assert.equal((await style(full)).state, "paused", "should pause on hover");
   await page.mouse.move(5, 5);
-  await page.locator("[data-pitch-cta]").focus();
-  assert.equal((await style("[data-pitch-cta]")).state, "paused", "should pause on focus");
-  await page.locator("[data-pitch-cta]").blur();
+  await page.locator(full).focus();
+  assert.equal((await style(full)).state, "paused", "should pause on focus");
+  await page.locator(full).blur();
 
   await page.getByRole("button", { name: "Minimize demo banner" }).click();
-  await page.waitForFunction(() => document.activeElement?.matches("[data-ribbon-expand]"), null, { timeout: 2000 });
-  await page.locator("[data-ribbon-expand]").blur();
+  await page.waitForFunction(() => document.activeElement?.matches("[data-foh-pill-expand]"), null, { timeout: 2000 });
+  await page.locator("[data-foh-pill-expand]").blur();
   await page.mouse.move(5, 5);
-  const mini = await style("[data-pitch-cta-mini]");
+  const mini = await style(".foh-pill--tab [data-pitch-cta]");
   assert.equal(mini.name, "foh-nudge", "tab Pitch arrow should nudge too");
   assert.equal(mini.state, "running");
   await ctx.close();
@@ -187,7 +194,7 @@ test("Pitch nudges in both states, pauses on hover and focus, and stops under re
   const reduced = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
   const rp = await reduced.newPage();
   await rp.goto(`${ORIGIN}/`, { waitUntil: "load" });
-  const name = await rp.locator("[data-pitch-cta]").evaluate((el) => getComputedStyle(el).animationName);
+  const name = await rp.locator(".foh-pill--full [data-pitch-cta]").evaluate((el) => getComputedStyle(el).animationName);
   await reduced.close();
   assert.equal(name, "none", "animation must be off under prefers-reduced-motion");
 });

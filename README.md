@@ -2,7 +2,7 @@
 
 A sales-pitch demo built by **HAI Consulting** for Utah First Property Management (Wilprop, LLC; principal broker Bryan Wilson; [utah1st.com](https://www.utah1st.com)), with offices in St. George and Cedar City, Utah.
 
-**This is not the official Utah First site.** It is noindexed, and a "Demo concept by Front of House" pill (the same design as the Sterling demo) appears on every page. It can be minimized to a small "FOH Demo" tab, but never removed; the state is kept in localStorage. The Pleasant Grove company "Utah First Realty and Property Management" is a separate business and does not appear anywhere in the demo.
+**This is not the official Utah First site.** It is noindexed, and a "Demo concept by Front of House" pill (the same design as the Sterling demo) appears on every page. It is Sterling's self-contained `src/components/foh/demo-pill.tsx`, rendered once in the root layout, with only the phone bottom offset changed to 12px (Utah First has no mobile action bar). It can be minimized to a small "FOH Demo" tab, but never removed; the state is kept in localStorage (`foh-demo-pill`). The Pleasant Grove company "Utah First Realty and Property Management" is a separate business and does not appear anywhere in the demo.
 
 - Live demo (GitHub Pages): https://haiconsulting.github.io/hai-demo-utah-first-pm-st-george/
 - Internal pitch page: `/pitch/` (compares the current Duda site with the demo and lays out HAI's offer)
