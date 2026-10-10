@@ -18,7 +18,7 @@ A sales-pitch demo built by **HAI Consulting** for Utah First Property Managemen
 | `/services/` | Management, leasing and screening, owner statements, rent collection, video documentation and inspections, HOA management |
 | `/residents/` | Tenant & Owner Hub: emergency vs non-emergency maintenance first, pay rent, listings and applications, owner portal (all existing AppFolio URLs) |
 | `/es/` | Spanish hub (*Hablamos español*), with `hreflang` alternates |
-| `/pitch/` | HAI Consulting pitch: audit vs demo, competitor gap (24/7), reputation, offer, facts to confirm |
+| `/pitch/` | HAI Consulting pitch: before/after screenshots of utah1st.com vs the demo, owner outcome cards, an owner-facing comparison with a collapsible "Technical details" section (titles, meta, H1s, schema, llms.txt, speed), competitor gap (24/7), reputation, offer, facts to confirm |
 | `/llms.txt`, `/sitemap.xml`, `/robots.txt` | Generated at build time with absolute, base-path-aware URLs |
 
 SEO and AI findability:
@@ -92,6 +92,7 @@ It then runs `tests/mobile-layout.test.mjs` with Playwright and the locally inst
 | `NEXT_PUBLIC_NOINDEX` | `true` | Set to `false` to allow indexing (robots meta and robots.txt) |
 | `NEXT_OUTPUT` | `export` | `standalone` builds a Node server (used by the Dockerfile) |
 | `NEXT_PUBLIC_HAI_CONTACT_EMAIL` / `_PHONE` | empty | HAI contact on `/pitch`; a placeholder shows when empty |
+| `NEXT_PUBLIC_HAI_BOOKING_URL` | empty | Target for "Book a 15-min walkthrough" on `/pitch` (falls back to the contact email; a placeholder shows when both are empty) |
 
 ## Deploy
 

@@ -1,12 +1,10 @@
 import { AlertTriangle, ArrowUpRight, BadgeCheck, KeyRound, LineChart, Phone, Wallet, Wrench } from "lucide-react";
 import Link from "next/link";
-import heroImg from "@/assets/photos/modern-farmhouse.webp";
-import heroImgSmall from "@/assets/photos/modern-farmhouse-800.webp";
 import { ResponsiveImg } from "@/components/responsive-img";
+import { photos } from "@/lib/photos";
 import { AreaList, FaqList } from "@/components/blocks";
 import { CtaLink } from "@/components/cta-link";
 import { JsonLd } from "@/components/json-ld";
-import { Placeholder } from "@/components/placeholder";
 import type { Faq } from "@/lib/faq";
 import { pageMeta } from "@/lib/metadata";
 import { breadcrumbSchema, faqSchema, graph } from "@/lib/schema";
@@ -66,13 +64,9 @@ export default function SpanishPage() {
               {company.email}
             </CtaLink>
           </div>
-          <p className="mt-4">
-            <Placeholder>Traducción de demostración: revisar con el equipo de Utah First</Placeholder>
-          </p>
         </div>
         <ResponsiveImg
-          small={heroImgSmall}
-          large={heroImg}
+          photo={photos.farmhouse}
           alt="Casa blanca de dos pisos estilo granja con césped verde bajo el cielo azul del sur de Utah"
           priority
           sizes="(min-width: 1024px) 480px, 100vw"
@@ -161,7 +155,7 @@ export default function SpanishPage() {
                 <br />
                 St. George, UT {sg.zip}
                 <br />
-                <a href={`tel:${sg.phone!.e164}`} className="font-semibold text-night">
+                <a href={`tel:${sg.phone!.e164}`} className="inline-flex min-h-11 items-center font-semibold text-night">
                   {sg.phone!.display}
                 </a>
               </address>
@@ -177,10 +171,11 @@ export default function SpanishPage() {
                 {cc.street} {cc.suite}
                 <br />
                 Cedar City, UT {cc.zip}
+                <br />
+                <a href={`tel:${cc.phone!.e164}`} className="inline-flex min-h-11 items-center font-semibold text-night">
+                  {cc.phone!.display}
+                </a>
               </address>
-              <p className="mt-3">
-                <Placeholder>Teléfono y horario: por confirmar</Placeholder>
-              </p>
             </div>
           </div>
           <h3 className="mt-10 text-xl font-bold">Áreas de servicio</h3>
@@ -203,6 +198,7 @@ export default function SpanishPage() {
           </div>
           <FaqList faqs={faqs} />
         </div>
+        <p className="container-page mt-12 text-xs text-muted-ink">Traducción en revisión con el equipo de Utah First.</p>
       </section>
     </div>
   );

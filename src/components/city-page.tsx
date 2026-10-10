@@ -1,10 +1,10 @@
-import Image, { type StaticImageData } from "next/image";
+import { ResponsiveImg } from "@/components/responsive-img";
+import type { Photo } from "@/lib/photos";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, CalendarCheck, ClipboardCheck, FileText, Phone, Video, Wallet, Wrench } from "lucide-react";
 import { AreaList, Breadcrumbs, FaqList, OfficeCard, Ridge, SectionHeading } from "@/components/blocks";
 import { CtaLink } from "@/components/cta-link";
 import { JsonLd } from "@/components/json-ld";
-import { Placeholder } from "@/components/placeholder";
 import type { Faq } from "@/lib/faq";
 import { breadcrumbSchema, faqSchema, graph, officeSchema } from "@/lib/schema";
 import { mainPhone, testimonials, type Office } from "@/lib/site";
@@ -14,8 +14,8 @@ type Props = {
   h1: string;
   lede: React.ReactNode;
   intro: React.ReactNode;
-  heroImage: { src: StaticImageData; alt: string };
-  gallery: { src: StaticImageData; alt: string }[];
+  heroImage: { photo: Photo; alt: string };
+  gallery: { photo: Photo; alt: string }[];
   areas: readonly string[];
   areasNote?: React.ReactNode;
   listingsUrl: string;
@@ -66,11 +66,10 @@ export function CityPage({ office, h1, lede, intro, heroImage, gallery, areas, a
               )}
             </div>
           </div>
-          <Image
-            src={heroImage.src}
+          <ResponsiveImg
+            photo={heroImage.photo}
             alt={heroImage.alt}
             priority
-            fetchPriority="high"
             sizes="(min-width: 1024px) 480px, 100vw"
             className="aspect-[4/3] w-full rounded-[2rem] rounded-tr-[5rem] object-cover shadow-[0_30px_60px_-30px_rgba(122,46,29,.55)]"
           />
@@ -82,7 +81,7 @@ export function CityPage({ office, h1, lede, intro, heroImage, gallery, areas, a
           <div>
             <SectionHeading id="local-services" kicker="Services" title={`Property management services in ${office.city}`} />
             <div className="prose-uf mt-5 text-lg">{intro}</div>
-            <Link href="/services/" className="mt-6 inline-flex items-center gap-1 font-semibold text-rock-deep">
+            <Link href="/services/" className="mt-4 inline-flex min-h-11 items-center gap-1 font-semibold text-rock-deep">
               How each service works <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </div>
@@ -113,12 +112,9 @@ export function CityPage({ office, h1, lede, intro, heroImage, gallery, areas, a
             <p className="mt-2 text-muted-ink">
               Browse current vacancies and apply online through Utah First&rsquo;s AppFolio listings.
             </p>
-            <a href={listingsUrl} rel="noopener" className="mt-3 inline-flex items-center gap-1 font-semibold text-rock-deep">
+            <a href={listingsUrl} rel="noopener" className="mt-2 inline-flex min-h-11 items-center gap-1 font-semibold text-rock-deep">
               View {office.city} rentals <ArrowUpRight className="size-4" aria-hidden="true" />
             </a>
-            <p className="mt-3">
-              <Placeholder>Live build: available homes render here as crawlable HTML from the AppFolio feed</Placeholder>
-            </p>
           </div>
           <OfficeCard office={office} headingLevel="h2" />
         </div>
@@ -132,7 +128,7 @@ export function CityPage({ office, h1, lede, intro, heroImage, gallery, areas, a
             <ul className="grid gap-4 sm:grid-cols-3">
               {gallery.map((g) => (
                 <li key={g.alt}>
-                  <Image src={g.src} alt={g.alt} sizes="(min-width: 640px) 33vw, 100vw" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+                  <ResponsiveImg photo={g.photo} alt={g.alt} sizes="(min-width: 1216px) 368px, (min-width: 640px) 31vw, 92vw" className="aspect-[4/3] w-full rounded-2xl object-cover" />
                 </li>
               ))}
             </ul>

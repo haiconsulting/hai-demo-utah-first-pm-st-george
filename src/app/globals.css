@@ -133,7 +133,7 @@
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--color-rock);
+    color: var(--color-rock-deep);
   }
   .band-stripes {
     background-color: var(--color-sand-2);

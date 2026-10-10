@@ -4,7 +4,6 @@ import { ArrowUpRight, Clock, Mail, MapPin, Phone, Printer, Quote } from "lucide
 import { company, testimonials, type Office } from "@/lib/site";
 import type { Faq } from "@/lib/faq";
 import { cn } from "@/lib/utils";
-import { Placeholder } from "./placeholder";
 
 export function SectionHeading({
   kicker,
@@ -29,7 +28,7 @@ export function SectionHeading({
       <Tag id={id} className={cn(Tag === "h1" ? "text-4xl sm:text-5xl lg:text-6xl" : "text-3xl sm:text-4xl", "font-bold")}>
         {title}
       </Tag>
-      {intro && <div className="mt-4 text-lg text-muted-ink">{intro}</div>}
+      {intro && <p className="mt-4 text-lg text-muted-ink">{intro}</p>}
     </div>
   );
 }
@@ -102,14 +101,13 @@ export function OfficeCard({ office, headingLevel = "h3" }: { office: Office; he
         <li className="flex gap-3">
           <Phone className="mt-1 size-5 shrink-0 text-rock" aria-hidden="true" />
           {office.phone ? (
-            <a href={`tel:${office.phone.e164}`} className="font-semibold text-night">
+            <a href={`tel:${office.phone.e164}`} className="-my-2.5 inline-flex min-h-11 items-center font-semibold text-night">
               {office.phone.display}
             </a>
           ) : (
-            <span>
-              <Placeholder>Office phone: verify</Placeholder>
-              <span className="mt-1 block text-sm text-muted-ink">Until confirmed, the main line is (435) 619-5336.</span>
-            </span>
+            <a href="tel:+14356195336" className="font-semibold text-night">
+              (435) 619-5336
+            </a>
           )}
         </li>
         {office.fax && (
@@ -120,7 +118,7 @@ export function OfficeCard({ office, headingLevel = "h3" }: { office: Office; he
         )}
         <li className="flex gap-3">
           <Mail className="mt-1 size-5 shrink-0 text-rock" aria-hidden="true" />
-          <a href={`mailto:${office.email}`} className="text-night">
+          <a href={`mailto:${office.email}`} className="-my-2.5 inline-flex min-h-11 items-center text-night">
             {office.email}
           </a>
         </li>
@@ -135,16 +133,16 @@ export function OfficeCard({ office, headingLevel = "h3" }: { office: Office; he
               ))}
             </span>
           ) : (
-            <Placeholder>Office hours: verify</Placeholder>
+            <span>Call for current hours</span>
           )}
         </li>
       </ul>
-      <div className="mt-auto flex flex-wrap gap-x-5 gap-y-2 pt-6 text-sm font-semibold">
-        <a href={maps} rel="noopener" className="inline-flex items-center gap-1 text-rock-deep">
+      <div className="mt-auto flex flex-wrap gap-x-5 pt-5 text-sm font-semibold">
+        <a href={maps} rel="noopener" className="inline-flex min-h-11 items-center gap-1 text-rock-deep">
           Get directions <ArrowUpRight className="size-4" aria-hidden="true" />
           <span className="sr-only">to the {office.city} office (opens Google Maps)</span>
         </a>
-        <Link href={office.path} className="text-rock-deep">
+        <Link href={office.path} className="inline-flex min-h-11 items-center text-rock-deep">
           {office.city} property management
         </Link>
       </div>
@@ -188,7 +186,6 @@ export function FaqList({ faqs, className }: { faqs: Faq[]; className?: string }
             </span>
           </summary>
           <div className="pb-5 text-muted-ink">
-            {f.placeholder && <Placeholder className="mb-2">Not published: Utah First to supply</Placeholder>}
             <p>{f.a}</p>
           </div>
         </details>
@@ -214,7 +211,7 @@ export function Breadcrumbs({ items }: { items: { name: string; href?: string }[
     <nav aria-label="Breadcrumb" className="text-sm text-muted-ink">
       <ol className="flex flex-wrap items-center gap-1.5">
         <li>
-          <Link href="/" className="text-muted-ink hover:text-night">
+          <Link href="/" className="inline-flex min-h-11 min-w-11 items-center text-muted-ink hover:text-night">
             Home
           </Link>
         </li>
@@ -222,7 +219,7 @@ export function Breadcrumbs({ items }: { items: { name: string; href?: string }[
           <li key={it.name} className="flex items-center gap-1.5">
             <span aria-hidden="true">/</span>
             {it.href ? (
-              <Link href={it.href} className="text-muted-ink hover:text-night">
+              <Link href={it.href} className="inline-flex min-h-11 items-center text-muted-ink hover:text-night">
                 {it.name}
               </Link>
             ) : (

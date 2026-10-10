@@ -16,7 +16,7 @@ Note: Utah First Realty and Property Management in Pleasant Grove, UT is a separ
 ## Offices
 
 - St. George (headquarters): ${sg.street} ${sg.suite}, St. George, UT ${sg.zip}. Phone ${sg.phone!.display}. Fax ${sg.fax!.display}. Email ${sg.email}. Hours: Mon-Thu 9am-5pm, Fri 9am-3pm, Sat-Sun closed. Page: ${abs(sg.path)}
-- Cedar City: ${cc.street} ${cc.suite}, Cedar City, UT ${cc.zip}. Phone and hours not yet confirmed; call the main line ${sg.phone!.display}. Page: ${abs(cc.path)}
+- Cedar City: ${cc.street} ${cc.suite}, Cedar City, UT ${cc.zip}. Phone ${cc.phone!.display}. Page: ${abs(cc.path)}
 
 ## Services
 

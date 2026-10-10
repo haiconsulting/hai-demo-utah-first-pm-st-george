@@ -1,7 +1,4 @@
-import heroImg from "@/assets/photos/home-dark-garage.webp";
-import duplex from "@/assets/photos/duplex-two-garages.webp";
-import brickSign from "@/assets/photos/community-sign-brick.webp";
-import stucco from "@/assets/photos/home-stucco-tile-roof.webp";
+import { photos } from "@/lib/photos";
 import { CityPage } from "@/components/city-page";
 import { tenantFaqs, ownerFaqs } from "@/lib/faq";
 import { pageMeta } from "@/lib/metadata";
@@ -40,11 +37,11 @@ export default function StGeorgePage() {
           </p>
         </>
       }
-      heroImage={{ src: heroImg, alt: "Single-story home with a dark garage door, stone accents and a paver driveway" }}
+      heroImage={{ photo: photos.homeDarkGarage, alt: "Single-story home with a dark garage door, stone accents and a paver driveway" }}
       gallery={[
-        { src: duplex, alt: "Two-story duplex with two garages and a wide concrete driveway" },
-        { src: brickSign, alt: "Brick community entrance sign reading Paradise Cove, with white gravel and shrubs" },
-        { src: stucco, alt: "Two-story stucco home with a tile roof and desert trees" },
+        { photo: photos.duplex, alt: "Two-story duplex with two garages and a wide concrete driveway" },
+        { photo: photos.communitySignBrick, alt: "Brick community entrance sign reading Paradise Cove, with white gravel and shrubs" },
+        { photo: photos.homeStucco, alt: "Two-story stucco home with a tile roof and desert trees" },
       ]}
       areas={washingtonCountyAreas}
       listingsUrl={portals.listingsStGeorge}

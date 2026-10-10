@@ -34,7 +34,7 @@ export function SiteNav() {
                 lang={"lang" in item ? item.lang : undefined}
                 aria-current={isActive(item.href) ? "page" : undefined}
                 className={cn(
-                  "rounded-full px-3 py-2 text-[0.95rem] font-semibold text-text no-underline transition-colors hover:bg-sand-2 hover:text-night",
+                  "rounded-full px-2.5 py-2 text-[0.95rem] font-semibold whitespace-nowrap text-text no-underline transition-colors hover:bg-sand-2 hover:text-night xl:px-3",
                   isActive(item.href) && "bg-sand-2 text-night",
                 )}
               >

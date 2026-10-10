@@ -43,7 +43,7 @@ test("pitch comparison rows are full-width stacked cards at 390x844", { skip: !c
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(`${ORIGIN}/pitch/`, { waitUntil: "load" });
   const result = await page.evaluate(() => {
-    const rows = [...document.querySelectorAll("[data-compare-row]")].filter((el) => el.offsetParent !== null);
+    const rows = [...document.querySelectorAll("[data-compare-row]")].filter((el) => el.checkVisibility());
     return {
       viewport: window.innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
@@ -52,12 +52,143 @@ test("pitch comparison rows are full-width stacked cards at 390x844", { skip: !c
     };
   });
   await page.close();
-  assert.ok(result.widths.length >= 10, `expected visible comparison cards, found ${result.widths.length}`);
+  assert.ok(result.widths.length >= 6, `expected visible comparison cards, found ${result.widths.length}`);
   for (const w of result.widths) {
     assert.ok(w >= result.viewport * 0.9, `row is ${Math.round(w)}px, under 90% of ${result.viewport}px`);
   }
   assert.equal(result.tableVisible, false, "desktop table should be hidden on mobile");
   assert.ok(result.scrollWidth <= result.viewport, `horizontal scroll: ${result.scrollWidth}px > ${result.viewport}px`);
+});
+
+test("pitch technical details are collapsed by default and open to full-width cards", { skip: !chromePath && "Chrome not found" }, async () => {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(`${ORIGIN}/pitch/`, { waitUntil: "load" });
+  const hiddenBefore = await page.locator("[data-technical] [data-compare-row]").first().isVisible();
+  await page.locator("[data-technical] summary").click();
+  const r = await page.evaluate(() => ({
+    vw: window.innerWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    widths: [...document.querySelectorAll("[data-technical] [data-compare-row]")].map((el) => el.getBoundingClientRect().width),
+    text: document.querySelector("[data-technical]").innerText,
+  }));
+  await page.close();
+  assert.equal(hiddenBefore, false, "technical rows should start collapsed");
+  for (const k of ["Homepage title", "Meta description", "H1 heading", "Business schema", "llms.txt"]) assert.ok(r.text.includes(k), `technical details missing ${k}`);
+  for (const w of r.widths) assert.ok(w >= r.vw * 0.85, `technical card is ${Math.round(w)}px at ${r.vw}px`);
+  assert.ok(r.scrollWidth <= r.vw, "horizontal scroll with technical details open");
+});
+
+test("pitch before/after shots and pricing cards hold up at 320 to 430px", { skip: !chromePath && "Chrome not found" }, async () => {
+  for (const width of widths) {
+    const page = await browser.newPage({ viewport: { width, height: 844 } });
+    await page.goto(`${ORIGIN}/pitch/`, { waitUntil: "load" });
+    const r = await page.evaluate(() => ({
+      shots: [...document.querySelectorAll("[data-before-after] img")].map((img) => ({ w: img.getBoundingClientRect().width, ok: img.complete && img.naturalWidth > 0 })),
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+    await page.close();
+    assert.equal(r.shots.length, 4, "two desktop and two mobile screenshots");
+    assert.ok(r.shots.every((s) => s.ok), `a before/after image failed to load at ${width}px`);
+    assert.ok(r.scrollWidth <= width, `horizontal scroll at ${width}px`);
+  }
+  const desk = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await desk.goto(`${ORIGIN}/pitch/`, { waitUntil: "load" });
+  const plans = await desk.evaluate(() => [...document.querySelectorAll("[data-plan]")].map((el) => ({ h: el.getBoundingClientRect().height, bullets: el.querySelectorAll("ul li").length })));
+  const shotsSideBySide = await desk.evaluate(() => {
+    const figs = [...document.querySelectorAll("[data-before-after] > figure")].map((f) => f.getBoundingClientRect());
+    return figs.length === 2 && Math.abs(figs[0].top - figs[1].top) < 2 && figs[0].right <= figs[1].left;
+  });
+  await desk.close();
+  assert.ok(shotsSideBySide, "before/after should sit side by side on desktop");
+  assert.equal(plans.length, 3);
+  for (const p of plans) assert.ok(p.bullets >= 3 && p.bullets <= 4, `each plan needs 3 to 4 bullets, found ${p.bullets}`);
+  assert.ok(Math.max(...plans.map((p) => p.h)) - Math.min(...plans.map((p) => p.h)) < 2, "plan cards should be equal height");
+});
+
+test("homepage H1 sets in 3 lines across desktop widths", { skip: !chromePath && "Chrome not found" }, async () => {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(`${ORIGIN}/`, { waitUntil: "load" });
+  for (const width of [1024, 1152, 1280, 1366, 1440, 1536, 1680, 1920]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.reload({ waitUntil: "load" });
+    const lines = await page.evaluate(async () => {
+      await document.fonts.ready;
+      const range = document.createRange();
+      range.selectNodeContents(document.querySelector("h1"));
+      return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
+    });
+    assert.equal(lines, 3, `H1 wraps to ${lines} lines at ${width}px`);
+  }
+  await ctx.close();
+});
+
+test("desktop header nav never wraps from 1024 to 1920px", { skip: !chromePath && "Chrome not found" }, async () => {
+  for (const width of [1024, 1152, 1280, 1440, 1920]) {
+    const page = await browser.newPage({ viewport: { width, height: 800 } });
+    await page.goto(`${ORIGIN}/`, { waitUntil: "load" });
+    const wrapped = await page.evaluate(() =>
+      [...document.querySelectorAll('header nav[aria-label="Main"] a, header a[href^="tel:"]')]
+        .filter((a) => a.checkVisibility())
+        .filter((a) => {
+          const range = document.createRange();
+          range.selectNodeContents(a);
+          return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size > 1;
+        })
+        .map((a) => a.textContent.trim()),
+    );
+    await page.close();
+    assert.deepEqual(wrapped, [], `header items wrap at ${width}px`);
+  }
+});
+
+test("tap targets are at least 44px on mobile (inline links in sentences excepted)", { skip: !chromePath && "Chrome not found" }, async () => {
+  const failures = [];
+  for (const path of pages) {
+    const page = await browser.newPage({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+    await page.goto(`${ORIGIN}${path}`, { waitUntil: "load" });
+    if (path === "/residents/" || path === "/services/") await page.waitForTimeout(50);
+    const small = await page.evaluate(() =>
+      [...document.querySelectorAll("header a, header button, main a, main button, main summary, footer a, footer button")]
+        .filter((el) => el.checkVisibility())
+        .filter((el) => !el.closest("p, blockquote, figcaption, [data-demo-ribbon], .foh-pill"))
+        .map((el) => ({ el, r: el.getBoundingClientRect() }))
+        .filter(({ r }) => r.width > 2 && r.height > 2)
+        .filter(({ r }) => r.height < 44 || r.width < 44)
+        .map(({ el, r }) => `${el.textContent.trim().slice(0, 40) || el.getAttribute("aria-label")} (${Math.round(r.width)}x${Math.round(r.height)})`),
+    );
+    if (small.length) failures.push(`${path}: ${small.join("; ")}`);
+    await page.close();
+  }
+  assert.deepEqual(failures, [], `targets under 44px:\n${failures.join("\n")}`);
+});
+
+test("hero kicker contrast is at least 4.5:1 on the lightest hero background", { skip: !chromePath && "Chrome not found" }, async () => {
+  const page = await browser.newPage({ viewport: { width: 320, height: 700 } });
+  await page.goto(`${ORIGIN}/`, { waitUntil: "networkidle" });
+  const kicker = page.locator('section[aria-labelledby="hero-title"] .kicker');
+  await kicker.waitFor();
+  const rgb = await kicker.evaluate((el) => getComputedStyle(el).color);
+  await page.close();
+  const lum = (c) => {
+    const [r, g, b] = c.map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const fg = rgb.match(/\d+/g).slice(0, 3).map(Number);
+  const lightest = [0xf4, 0xdb, 0xb8];
+  const ratio = (lum(lightest) + 0.05) / (lum(fg) + 0.05);
+  assert.ok(ratio >= 4.5, `kicker ${rgb} has contrast ${ratio.toFixed(2)}:1 against #f4dbb8`);
+});
+
+test("phones get the 480px card images", { skip: !chromePath && "Chrome not found" }, async () => {
+  const page = await browser.newPage({ viewport: { width: 375, height: 812 }, deviceScaleFactor: 1 });
+  await page.goto(`${ORIGIN}/st-george/`, { waitUntil: "load" });
+  await page.evaluate(() => document.querySelectorAll("img[loading=lazy]").forEach((i) => (i.loading = "eager")));
+  await page.waitForFunction(() => [...document.querySelectorAll("main ul img")].every((i) => i.complete && i.currentSrc));
+  const srcs = await page.evaluate(() => [...document.querySelectorAll("main ul img")].map((i) => i.currentSrc));
+  await page.close();
+  assert.ok(srcs.length >= 3);
+  for (const src of srcs) assert.match(src, /-480\./, `card served ${src}`);
 });
 
 test("pitch comparison uses the table on desktop with sensible columns", { skip: !chromePath && "Chrome not found" }, async () => {

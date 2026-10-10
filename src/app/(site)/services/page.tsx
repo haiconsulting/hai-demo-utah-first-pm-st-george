@@ -1,10 +1,9 @@
-import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
-import stucco from "@/assets/photos/home-stucco-tile-roof.webp";
+import { ResponsiveImg } from "@/components/responsive-img";
+import { photos } from "@/lib/photos";
 import { Breadcrumbs, FaqList, Ridge, SectionHeading } from "@/components/blocks";
 import { CtaLink } from "@/components/cta-link";
 import { JsonLd } from "@/components/json-ld";
-import { Placeholder } from "@/components/placeholder";
 import { ownerFaqs } from "@/lib/faq";
 import { pageMeta } from "@/lib/metadata";
 import { breadcrumbSchema, graph, serviceSchema } from "@/lib/schema";
@@ -52,11 +51,10 @@ export default function ServicesPage() {
             </CtaLink>
           </div>
         </div>
-        <Image
-          src={stucco}
+        <ResponsiveImg
+          photo={photos.homeStucco}
           alt="Two-story stucco home with a tile roof and desert trees"
           priority
-          fetchPriority="high"
           sizes="(min-width: 1024px) 420px, 100vw"
           className="aspect-[4/3] w-full rounded-[2rem] object-cover"
         />
@@ -77,7 +75,7 @@ export default function ServicesPage() {
         <ul className="flex flex-wrap gap-2">
           {services.map((s) => (
             <li key={s.id}>
-              <a href={`#${s.id}`} className="inline-block rounded-full border border-line bg-cream px-4 py-2 text-sm font-semibold text-night no-underline hover:bg-sand-2">
+              <a href={`#${s.id}`} className="inline-flex min-h-11 items-center rounded-full border border-line bg-cream px-4 text-sm font-semibold text-night no-underline hover:bg-sand-2">
                 {s.title}
               </a>
             </li>
@@ -109,11 +107,6 @@ export default function ServicesPage() {
                   </li>
                 ))}
               </ul>
-              {s.verify && (
-                <p className="mt-4">
-                  <Placeholder>{s.verify}</Placeholder>
-                </p>
-              )}
             </div>
           </section>
         ))}
@@ -140,9 +133,6 @@ export default function ServicesPage() {
             <SectionHeading id="pricing-title" kicker="Pricing" title="Clear fees, in writing" />
             <p className="mt-4 text-muted-ink">
               Ask for current pricing with your free rent analysis. A simple fee table will live here.
-            </p>
-            <p className="mt-4">
-              <Placeholder>Management, leasing and setup fees: Utah First to supply</Placeholder>
             </p>
           </div>
           <FaqList faqs={ownerFaqs.slice(0, 5)} />

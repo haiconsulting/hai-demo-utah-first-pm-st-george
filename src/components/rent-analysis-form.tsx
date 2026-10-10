@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Placeholder } from "./placeholder";
 
 type Data = {
   address: string;
@@ -181,9 +180,6 @@ export function RentAnalysisForm({ className, headingLevel = "h3" }: { className
           <li>They reach out by {data.contactPref.toLowerCase()} with a rent range and a management plan.</li>
           <li>No obligation. You decide if and when to list.</li>
         </ol>
-        <p className="mt-3 text-sm">
-          <Placeholder>Response time: confirm with Utah First</Placeholder>
-        </p>
         <Button type="button" variant="outline" onClick={reset} className="mt-6 h-11 rounded-full px-5">
           <RotateCcw aria-hidden="true" /> Start another analysis
         </Button>

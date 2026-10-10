@@ -2,8 +2,8 @@
  * Single source of truth for Utah First facts used across the demo.
  * Every value here comes from the HAI research one-pager or research.md
  * (utah1st.com, Iron County BOR, BBB, OpenCorporates). Anything not
- * verified is wrapped in a `Placeholder` at render time, never hard-coded
- * as fact.
+ * verified is left out of the site pages and listed on /pitch for Utah First
+ * to confirm, never hard-coded as fact.
  */
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -103,7 +103,8 @@ export const offices: Record<Office["id"], Office> = {
     street: "2113 N Main St",
     suite: "Ste. 1",
     zip: "84721",
-    phone: null,
+    // Public number from the Iron County Board of REALTORS and Google listings; on the /pitch confirm list.
+    phone: { display: "(435) 263-0437", e164: "+14352630437" },
     email: "info@utah1st.com",
     hoursVerified: false,
     path: "/cedar-city/",

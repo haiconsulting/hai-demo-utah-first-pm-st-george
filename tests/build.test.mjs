@@ -136,7 +136,8 @@ for (const [route, spec] of Object.entries(pages)) {
       }
       if (spec.office === "Cedar City") {
         assert.equal(office.address.streetAddress, "2113 N Main St Ste. 1");
-        assert.ok(!office.telephone, "Cedar City phone is unverified and must not be in schema");
+        assert.equal(office.telephone, "+14352630437", "Cedar City public phone");
+        assert.ok(!office.openingHoursSpecification, "Cedar City hours are unconfirmed and must not be in schema");
       }
     }
   });
@@ -197,6 +198,91 @@ test("foh-nudge animation exists and is disabled under reduced motion", () => {
     reduced.some((block) => /\.foh-nudge\{animation:none/.test(block)),
     "prefers-reduced-motion must set .foh-nudge { animation: none }",
   );
+});
+
+test("/pitch leads with owner outcomes and keeps SEO detail collapsed", () => {
+  const html = htmlFor("/pitch/");
+  const outcomesAt = html.indexOf("data-outcomes");
+  const technicalAt = html.indexOf("data-technical");
+  assert.ok(outcomesAt > 0 && technicalAt > outcomesAt, "outcome cards must come before technical details");
+  assert.ok((html.match(/data-outcome="true"/g) ?? []).length >= 5, "at least five outcome cards");
+  for (const t of ["rent analysis in 2 taps", "asks AI for St. George property managers", "Cedar City finally has its own page", "pay-rent and emergency info in one tap", "More calls and leads"]) {
+    assert.ok(html.includes(t), `missing outcome: ${t}`);
+  }
+  const technical = html.slice(technicalAt, html.indexOf("</details>", technicalAt));
+  assert.match(html.slice(technicalAt - 200, technicalAt), /<details/, "technical details must be a collapsible <details>");
+  for (const k of ["Homepage title", "Meta description", "H1 heading", "Business schema", "llms.txt"]) {
+    assert.ok(technical.includes(k), `${k} belongs in Technical details`);
+    assert.ok(!html.slice(0, technicalAt).includes(`>${k}<`), `${k} must not appear before Technical details`);
+  }
+  const beforeAfter = html.slice(html.indexOf("data-before-after"), html.indexOf("data-outcomes"));
+  assert.ok(html.indexOf("data-before-after") > html.indexOf("<h1"), "before/after sits under the headline");
+  assert.equal((beforeAfter.match(/<img/g) ?? []).length, 4, "before/after needs desktop and mobile shots of both sites");
+  assert.match(html, /Book a 15-min walkthrough/);
+  assert.ok(!/priced on a call/i.test(html), "replace 'priced on a call' with a from-price");
+  const addons = html.split('data-addon="true"').slice(1).map((chunk) => chunk.slice(0, 1200));
+  assert.ok(addons.length === 2 && addons.every((a) => /from \$___/.test(a) && /Placeholder/.test(a)), "add-on prices must be marked from $___ placeholders");
+  assert.match(html, /From \$2,000/);
+});
+
+test("site pages carry no placeholder chips; open items live on /pitch", () => {
+  for (const route of Object.keys(pages).filter((r) => r !== "/pitch/")) {
+    const html = htmlFor(route);
+    assert.ok(!html.includes("Placeholder, needs confirmation"), `${route} shows a placeholder chip`);
+    assert.ok(!/reviews: verify|: verify<|por confirmar/i.test(html), `${route} shows verify copy`);
+  }
+  const home = htmlFor("/");
+  assert.match(home, /4\.8<span[^>]*>&#9733;|4\.8<span[^>]*>★/, "St. George rating");
+  assert.match(home, /on Google, St\. George/);
+  assert.match(home, /on Google, Cedar City/);
+  const pitch = htmlFor("/pitch/");
+  for (const item of ["462", "85", "(435) 263-0437", "Spanish translation review", "Rent analysis response time"]) {
+    assert.ok(pitch.includes(item), `/pitch confirm list is missing ${item}`);
+  }
+  assert.match(htmlFor("/"), /A few details are still being confirmed/, "single subtle footer note");
+});
+
+test("Cedar City shows its public phone everywhere", () => {
+  for (const route of ["/", "/cedar-city/", "/es/", "/residents/"]) {
+    assert.ok(htmlFor(route).includes('href="tel:+14352630437"'), `${route} is missing the Cedar City tel: link`);
+  }
+  assert.match(read("llms.txt"), /Cedar City[^\n]*\(435\) 263-0437/);
+});
+
+test("/es/ keeps the translation note out of the opening", () => {
+  const html = htmlFor("/es/");
+  const note = html.indexOf("Traducción en revisión");
+  assert.ok(note > 0, "translation note should remain as a small footer line");
+  assert.ok(note > html.indexOf("Preguntas comunes"), "translation note must come after the page content");
+  assert.ok(!html.includes("Traducción de demostración"), "old opening banner must be gone");
+});
+
+test("404 renders inside the site chrome with a tappable phone", () => {
+  const html = read("404.html");
+  assert.match(html, /<header[\s>]/, "404 needs the site header");
+  assert.match(html, /<footer[\s>]/, "404 needs the site footer");
+  assert.ok(html.includes('href="tel:+14356195336"'), "404 needs a tel: link");
+  assert.match(html, /<meta property="og:image" content="[^"]+"/, "404 needs an og:image");
+  assert.equal((html.match(/<h1[\s>]/g) ?? []).length, 1);
+  assert.match(html, /--font-display-face|font-display/, "404 uses the brand display font");
+});
+
+test("footer office labels are not headings", () => {
+  const html = htmlFor("/");
+  const footer = html.slice(html.lastIndexOf("<footer"), html.lastIndexOf("</footer>"));
+  assert.ok(!/<h[1-6][\s>]/.test(footer), "footer should not add headings to the outline");
+});
+
+test("card photos ship 480px variants and the hero is preloaded", () => {
+  for (const route of ["/st-george/", "/cedar-city/", "/"]) {
+    const html = htmlFor(route);
+    const imgs = [...html.matchAll(/<img[^>]*srcSet="([^"]+)"/gi)].map((m) => m[1]);
+    assert.ok(imgs.length >= 2, `${route} photos need srcset`);
+    assert.ok(imgs.every((set) => /\b(480|800)w\b/.test(set)), `${route} has a photo without a small variant`);
+  }
+  const home = htmlFor("/");
+  assert.match(home, /<link rel="preload"[^>]*as="image"[^>]*imageSrcSet="[^"]*modern-farmhouse/i, "hero image should be preloaded");
+  assert.match(home, /<link rel="preload"[^>]*fetchPriority="high"[^>]*modern-farmhouse|<link rel="preload"[^>]*modern-farmhouse[^>]*fetchPriority="high"/i);
 });
 
 test("HAI pitch copy has no em dashes", () => {

@@ -5,7 +5,7 @@ export type Faq = { q: string; a: string; placeholder?: boolean };
 export const ownerFaqs: Faq[] = [
   {
     q: "How much does property management cost?",
-    a: "Utah First's management fees are not published yet. Fee schedule to be supplied by Utah First before launch.",
+    a: "Fees aren't listed online yet. Ask for current pricing when you request a free rent analysis or call (435) 619-5336.",
     placeholder: true,
   },
   {

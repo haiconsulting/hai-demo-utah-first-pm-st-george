@@ -2,7 +2,6 @@ import { AlertTriangle, ArrowUpRight, BadgeCheck, ClipboardList, FileText, KeyRo
 import Link from "next/link";
 import { Breadcrumbs, FaqList, SectionHeading } from "@/components/blocks";
 import { JsonLd } from "@/components/json-ld";
-import { Placeholder } from "@/components/placeholder";
 import { tenantFaqs } from "@/lib/faq";
 import { pageMeta } from "@/lib/metadata";
 import { breadcrumbSchema, faqSchema, graph } from "@/lib/schema";
@@ -25,7 +24,7 @@ type Action = {
 
 function ActionCard({ icon: Icon, title, body, href, cta }: Action) {
   const external = href.startsWith("http");
-  const cls = "mt-4 inline-flex items-center gap-1 font-semibold text-rock-deep";
+  const cls = "mt-3 inline-flex min-h-11 items-center gap-1 font-semibold text-rock-deep";
   return (
     <li className="flex flex-col rounded-2xl border border-line bg-cream p-6">
       <span className="grid size-11 place-items-center rounded-xl bg-rock text-white">
@@ -67,7 +66,7 @@ export default function ResidentsPage() {
             ["#rentals", "Find a rental"],
             ["#owners", "Owners"],
           ].map(([href, label]) => (
-            <a key={href} href={href} className="rounded-full border border-line bg-cream px-4 py-2 text-night no-underline hover:bg-sand-2">
+            <a key={href} href={href} className="inline-flex min-h-11 items-center rounded-full border border-line bg-cream px-4 text-night no-underline hover:bg-sand-2">
               {label}
             </a>
           ))}
@@ -111,9 +110,6 @@ export default function ResidentsPage() {
               </span>
             </a>
           </div>
-          <p className="text-xs text-sand/70 lg:col-span-2">
-            <Placeholder>Emergency examples: confirm Utah First&rsquo;s exact emergency policy</Placeholder>
-          </p>
         </div>
       </section>
 
@@ -158,9 +154,6 @@ export default function ResidentsPage() {
             <ActionCard icon={KeyRound} title="St. George rentals" body="Homes, townhomes and condos across Washington County." href={portals.listingsStGeorge} cta="View St. George vacancies and apply" />
             <ActionCard icon={KeyRound} title="Cedar City rentals" body="Rentals in Cedar City and Iron County." href={portals.listingsCedar} cta="View Cedar City vacancies and apply" />
           </ul>
-          <p className="mt-4">
-            <Placeholder>Live build: listing cards render here as crawlable HTML from the AppFolio feed</Placeholder>
-          </p>
         </div>
       </section>
 

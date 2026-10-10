@@ -1,15 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BadgeCheck, CalendarCheck, ClipboardCheck, FileText, Hammer, Home as HomeIcon, KeyRound, Phone, Video, Wallet, Wrench } from "lucide-react";
-import heroImg from "@/assets/photos/modern-farmhouse.webp";
-import heroImgSmall from "@/assets/photos/modern-farmhouse-800.webp";
 import { ResponsiveImg } from "@/components/responsive-img";
-import townhomes from "@/assets/photos/townhomes-palm.webp";
-import communitySign from "@/assets/photos/community-sign-palms-lava.webp";
+import { photos } from "@/lib/photos";
 import { AreaList, FaqList, OfficeCard, Ridge, SectionHeading, Testimonials } from "@/components/blocks";
 import { CtaLink } from "@/components/cta-link";
 import { JsonLd } from "@/components/json-ld";
-import { Placeholder } from "@/components/placeholder";
 import { RentAnalysisForm } from "@/components/rent-analysis-form";
 import { ownerFaqs, tenantFaqs } from "@/lib/faq";
 import { pageMeta } from "@/lib/metadata";
@@ -59,10 +54,10 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative overflow-hidden" aria-labelledby="hero-title">
         <div className="pointer-events-none absolute -top-24 -right-24 size-[28rem] rounded-full bg-sun/25 blur-3xl" aria-hidden="true" />
-        <div className="container-page relative grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:py-20">
+        <div className="container-page relative grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:py-20">
           <div>
             <p className="kicker">Property management &middot; St. George &amp; Cedar City</p>
-            <h1 id="hero-title" className="mt-4 text-[2.6rem] leading-[1.04] font-bold sm:text-6xl lg:text-[4.1rem]">
+            <h1 id="hero-title" className="mt-4 text-[2.6rem] leading-[1.04] font-bold sm:text-6xl lg:text-[clamp(2.75rem,4.3vw,3.7rem)]">
               Your Southern Utah rental, managed like it&rsquo;s <em className="text-rock">our own.</em>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-ink sm:text-xl">
@@ -86,15 +81,13 @@ export default function HomePage() {
                 <span className="block font-display text-3xl font-bold text-rock-deep">
                   4.8<span aria-hidden="true" className="text-sun">&#9733;</span>
                 </span>
-                <span className="text-sm text-muted-ink">Google, St. George</span>
-                <Placeholder className="mt-1">462 reviews: verify</Placeholder>
+                <span className="text-sm text-muted-ink">on Google, St. George</span>
               </li>
               <li>
                 <span className="block font-display text-3xl font-bold text-rock-deep">
                   5.0<span aria-hidden="true" className="text-sun">&#9733;</span>
                 </span>
-                <span className="text-sm text-muted-ink">Google, Cedar City</span>
-                <Placeholder className="mt-1">85 reviews: verify</Placeholder>
+                <span className="text-sm text-muted-ink">on Google, Cedar City</span>
               </li>
               <li>
                 <span className="block font-display text-3xl font-bold text-rock-deep">$0</span>
@@ -106,8 +99,7 @@ export default function HomePage() {
           <div className="relative">
             <div className="relative overflow-hidden rounded-[2rem] rounded-bl-[5rem] shadow-[0_30px_60px_-30px_rgba(122,46,29,.55)]">
               <ResponsiveImg
-                small={heroImgSmall}
-                large={heroImg}
+                photo={photos.farmhouse}
                 alt="Two-story white farmhouse-style home with a dark roof and a green lawn under a blue Southern Utah sky"
                 priority
                 sizes="(min-width: 1024px) 560px, 100vw"
@@ -134,7 +126,7 @@ export default function HomePage() {
               title="Full-service management, no surprises"
               intro="One local team for marketing, screening, rent, repairs and reporting, all tracked in AppFolio so you can see it."
             />
-            <Link href="/services/" className="inline-flex items-center gap-1 font-semibold text-rock-deep">
+            <Link href="/services/" className="inline-flex min-h-11 items-center gap-1 font-semibold text-rock-deep">
               All services <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </div>
@@ -166,8 +158,7 @@ export default function HomePage() {
             title="In their words"
             intro={
               <>
-                Real Google reviews, quoted as written.{" "}
-                <Placeholder>Live review counts and a review widget: verify before launch</Placeholder>
+                Real Google reviews, quoted as written.
               </>
             }
           />
@@ -205,8 +196,8 @@ export default function HomePage() {
             </div>
           </div>
           <div className="relative">
-            <Image
-              src={townhomes}
+            <ResponsiveImg
+              photo={photos.townhomes}
               alt="Two-story townhomes with palm trees and two-car garages"
               sizes="(min-width: 1024px) 560px, 100vw"
               className="aspect-[4/3] w-full rounded-[2rem] object-cover"
@@ -229,7 +220,7 @@ export default function HomePage() {
                   <dd className="font-bold text-rock-deep">$ ---</dd>
                 </div>
               </dl>
-              <Placeholder className="mt-3">Illustrative only, no real figures</Placeholder>
+              <p className="mt-3 text-xs text-muted-ink">Illustrative layout, not real figures.</p>
             </div>
           </div>
         </div>
@@ -278,7 +269,7 @@ export default function HomePage() {
             })}
           </ul>
           <p className="mt-6">
-            <Link href="/residents/" className="inline-flex items-center gap-1 font-semibold text-rock-deep">
+            <Link href="/residents/" className="inline-flex min-h-11 items-center gap-1 font-semibold text-rock-deep">
               Open the Tenant &amp; Owner Hub <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </p>
@@ -302,10 +293,10 @@ export default function HomePage() {
               <li>Single-family homes, townhomes, condos and HOAs</li>
               <li>St. George, Cedar City and {serviceAreas.length - 2} more Southern Utah communities</li>
             </ul>
-            <Image
-              src={communitySign}
+            <ResponsiveImg
+              photo={photos.communitySignPalms}
               alt="Bella Vista community entrance sign framed by palm trees and black lava rock"
-              sizes="(min-width: 1024px) 420px, 0px"
+              sizes="(min-width: 1024px) 420px, 1px"
               className="mt-8 hidden aspect-[4/3] w-full max-w-md rounded-2xl object-cover opacity-90 lg:block"
             />
           </div>

@@ -1,7 +1,6 @@
 import { Check } from "lucide-react";
 import { Breadcrumbs } from "@/components/blocks";
 import { JsonLd } from "@/components/json-ld";
-import { Placeholder } from "@/components/placeholder";
 import { RentAnalysisForm } from "@/components/rent-analysis-form";
 import { pageMeta } from "@/lib/metadata";
 import { breadcrumbSchema, graph, serviceSchema } from "@/lib/schema";
@@ -53,7 +52,7 @@ export default function RentAnalysisPage() {
             <a href={`tel:${mainPhone.e164}`} className="font-semibold text-rock-deep">
               {mainPhone.display}
             </a>
-            . <Placeholder>Response time: confirm</Placeholder>
+            .
           </p>
         </div>
         <RentAnalysisForm headingLevel="h2" />

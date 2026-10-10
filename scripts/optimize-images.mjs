@@ -29,6 +29,25 @@ for (const [file, name, width] of jobs) {
   console.log(name, info.width, info.height, info.size);
 }
 
+// 480px variants so cards on phones are not served 900px files.
+for (const [file, name] of [
+  ["Building_Pic.jpg", "townhomes-palm"],
+  ["20231005_121909.jpg", "duplex-two-garages"],
+  ["Desert_Reserve.jpg", "home-dark-garage"],
+  ["Padre_Lakes_Picture.jpg", "building-arched-entry"],
+  ["Entrance-6.jpg", "community-sign-palms-lava"],
+  ["IMG_7844.jpg", "community-sign-brick"],
+  ["Sagewood_pic.jpg", "community-sign-sagewood"],
+  ["1739386811779blob-91381d93.png", "home-stucco-tile-roof"],
+]) {
+  const info = await sharp(new URL(file, src).pathname)
+    .rotate()
+    .resize({ width: 480, withoutEnlargement: true })
+    .webp({ quality: 55, effort: 6 })
+    .toFile(new URL(`${name}-480.webp`, out).pathname);
+  console.log(`${name}-480`, info.width, info.height, info.size);
+}
+
 // Header logo: transparent WebP at 2x its 149px display width.
 {
   const info = await sharp(new URL("output-onlinepngtools-1920w-378w.png", src).pathname)

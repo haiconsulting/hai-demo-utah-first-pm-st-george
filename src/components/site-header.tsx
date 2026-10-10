@@ -11,13 +11,13 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-line bg-sand/95 backdrop-blur supports-[backdrop-filter]:bg-sand/85">
       <div className="container-page flex h-[4.5rem] items-center justify-between gap-4">
         <Link href="/" className="shrink-0 rounded-md" aria-label="Utah First Property Management, home">
-          <Image src={logo} alt="" width={149} height={60} priority className="h-[52px] w-auto" />
+          <Image src={logo} alt="" width={149} height={60} loading="eager" className="h-[52px] w-auto" />
         </Link>
         <SiteNav />
         <div className="hidden items-center gap-4 lg:flex">
           <a
             href={`tel:${mainPhone.e164}`}
-            className="flex items-center gap-1.5 text-sm font-semibold text-night no-underline hover:text-rock-deep"
+            className="hidden items-center gap-1.5 text-sm font-semibold whitespace-nowrap text-night no-underline hover:text-rock-deep xl:flex"
           >
             <Phone className="size-4 text-rock" aria-hidden="true" />
             {mainPhone.display}
